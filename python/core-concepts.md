@@ -4,9 +4,9 @@ This documentation covers essential patterns and usage for the Google Cloud Pyth
 
 ## 1. Pagination
 
-Most list methods in the Google Cloud Python library return a `Pager` object. This allows you to iterate over results without manually managing page tokens.
+Most list methods in the Google Cloud Python library return an iterator. This allows you to iterate over results without manually managing page tokens.
 
-The easiest way to handle pagination is to simply iterate over the response using a `for` loop. The library automatically fetches new pages in the background as you iterate.
+The easiest way to handle pagination is to simply use a `for` loop over the response. The library automatically fetches new pages in the background as you iterate.
 
 ```python
 from google.cloud import secretmanager_v1
@@ -14,14 +14,12 @@ from google.cloud import secretmanager_v1
 client = secretmanager_v1.SecretManagerServiceClient()
 
 # Prepare the request
-# The parent follows the format 'projects/{project_id}'
-request = secretmanager_v1.ListSecretsRequest(
-    parent="projects/my-project"
-)
+parent = "projects/my-project"
 
 # Call the API
-# This returns a ListSecretsPager, which is an iterable
-page_result = client.list_secrets(request=request)
+# This returns a secret_manager_v1.services.secret_manager_service.pagers.ListSecretsPager
+# which is an iterable of Secret objects
+page_result = client.list_secrets(request={"parent": parent})
 
 # Automatically fetches subsequent pages of secrets
 for secret in page_result:
@@ -30,39 +28,36 @@ for secret in page_result:
 
 ### Manual Pagination (Accessing Tokens)
 
-If you need to control pagination manually (e.g., for a web API that sends tokens to a frontend), you can access the `next_page_token` from the page object.
+If you need to control pagination manually (e.g., for a web API that sends tokens to a frontend), you can access the `next_page_token`.
 
 ```python
-# Prepare request with page size and optional token
-page_size = 10
-page_token = "previous_token_from_frontend" # Or None
+# Prepare request with page size
+request = {
+    "parent": "projects/my-project",
+    "page_size": 10,
+}
 
-request = secretmanager_v1.ListSecretsRequest(
-    parent="projects/my-project",
-    page_size=page_size,
-    page_token=page_token
-)
+# Check if we have a token from a previous request (e.g., from a query parameter)
+page_token = request_params.get("page_token")
+if page_token:
+    request["page_token"] = page_token
 
-# Call the API
-pager = client.list_secrets(request=request)
+page_result = client.list_secrets(request=request)
 
-# Iterate through the items of the CURRENT page only
-# Accessing .pages allows you to see the current page's metadata
-current_page = next(pager.pages)
-
-for secret in current_page:
-    # Process current page items
+# Process current page items
+for secret in page_result:
+    # Handle secret
     pass
 
 # Get the token for the next page (empty string if no more pages)
-next_token = pager.next_page_token
+next_token = page_result.next_page_token
 ```
 
 ## 2. Long Running Operations (LROs)
 
 Some operations, like creating a Compute Engine instance or training an AI model, take too long to complete in a single HTTP request. These return a **Long Running Operation (LRO)**.
 
-The Python library provides an `Operation` object (specifically from `google.api_core.operation`) to manage these.
+The Python library provides an `Operation` object to manage these.
 
 ### Polling for Completion
 
@@ -81,41 +76,37 @@ request = compute_v1.InsertInstanceRequest(
 )
 
 # Call the method
-# This returns a google.api_core.operation.Operation object
 operation = instances_client.insert(request=request)
 
 # Wait for the operation to complete
-# This blocks the script and polls periodically
-try:
-    result = operation.result()
-    # The operation succeeded
-    print(f"Result: {result}")
-except Exception as e:
-    # Handle error
-    print(f"Error: {e}")
+# This blocks the script, polling periodically
+result = operation.result()
+
+# Handle completion
+if not operation.error:
+    print("Operation succeeded")
+else:
+    print(f"Error: {operation.error}")
 ```
 
 ### Async / Non-Blocking Check
 
-If you don't want to block the script, you can store the operation name and check its status later.
+If you don't want to block the script, you can check the status and store the operation name to resume later.
 
 ```python
-# 1. Start operation
-operation = client.long_running_method(...)
-operation_name = operation.name
+# Start operation
+operation = client.long_running_method(request=request)
+operation_id = operation.operation.name
 
 # ... later, or in a different worker process ...
 
-# 2. Resume operation
-# You can reconstruct the operation object using the name
-from google.api_core import operations_v1
-# (Note: Specific implementation varies by service, 
-# but most clients have a way to fetch an operation by name)
-new_operation = client.get_operation(name=operation_name)
+# Resume operation using the operation name
+# Note: Most clients provide a way to get an operation status by name
+new_operation = client.get_operation(name=operation_id)
 
 if new_operation.done():
     # Handle success or error
-    print(new_operation.result())
+    pass
 ```
 
 ## 3. Update Masks
@@ -132,31 +123,30 @@ from google.protobuf import field_mask_pb2
 
 client = secretmanager_v1.SecretManagerServiceClient()
 
-# 1. Prepare the resource with NEW values
+# Prepare the resource with NEW values
 secret = secretmanager_v1.Secret(
     name="projects/my-project/secrets/my-secret",
     labels={"env": "production"} # We only want to update this field
 )
 
-# 2. Create the FieldMask
-# 'paths' MUST match the protobuf field names (snake_case)
+# Create the FieldMask
+# paths MUST match the protobuf field names (snake_case)
 update_mask = field_mask_pb2.FieldMask(paths=["labels"])
 
-# 3. Prepare the Request object
-request = secretmanager_v1.UpdateSecretRequest(
-    secret=secret,
-    update_mask=update_mask
+# Call the API
+client.update_secret(
+    request={
+        "secret": secret,
+        "update_mask": update_mask,
+    }
 )
-
-# 4. Call the API
-client.update_secret(request=request)
 ```
 
-**Note:** The field names in `paths` should be the protocol buffer field names (usually `snake_case`), which aligns with Python's naming conventions.
+**Note:** The field names in `paths` should be the protocol buffer field names (usually `snake_case`), which typically align with the attribute names in the Python objects.
 
 ## 4. Protobuf and gRPC
 
-The Google Cloud Python library supports two transports: **gRPC** and **REST (HTTP/1.1)**.
+The Google Cloud Python library primarily uses **gRPC** for transport, though many services also support **REST (HTTP/1.1)**.
 
 * **Protobuf (Protocol Buffers):** A mechanism for serializing structured data. It is the interface language for gRPC.
 
@@ -164,75 +154,72 @@ The Google Cloud Python library supports two transports: **gRPC** and **REST (HT
 
 ### Installation & Setup
 
-In Python, the `grpcio` and `protobuf` dependencies are typically installed automatically when you install a Google Cloud library.
+To use gRPC and Protobuf, you simply install the libraries via pip. They are included as dependencies for most Google Cloud client libraries.
 
 ```bash
-# Install the library
-pip install google-cloud-secret-manager
+# Install the core libraries
+pip install grpcio protobuf
 ```
-
-For performance-critical applications, ensure you have the C-extension versions of protobuf installed (usually handled by `pip`).
 
 ### Usage in Client
 
-The client library automatically chooses gRPC if available. You can force a specific transport using the `transport` argument when creating a client.
+The client library automatically uses gRPC by default. You can force a specific transport using the `transport` option when creating a client.
 
 ```python
 from google.cloud import pubsub_v1
 
-# Use gRPC (default)
+# Use the gRPC transport (default)
 publisher = pubsub_v1.PublisherClient(transport="grpc")
 
-# Use REST
-publisher_rest = pubsub_v1.PublisherClient(transport="rest")
+# Or force REST transport if supported by the library
+# publisher = pubsub_v1.PublisherClient(transport="rest")
 ```
 
 ## 5. gRPC Streaming
 
-gRPC Streaming allows continuous data flow between client and server. In Python, this is handled via **iterators** and **generators**.
+gRPC Streaming allows continuous data flow between client and server. In Python, this is most commonly handled using **Iterators** or **Generators**.
 
 ### Streaming Types
 
 | Type | Description | Common Python Use Case |
 | :--- | :--- | :--- |
-| **Server-Side** | Client sends one request; Server returns an iterator. | Reading large datasets (BigQuery, Spanner) or watching logs. |
-| **Client-Side** | Client sends an iterator of messages; Server returns a single response. | Uploading large files or ingesting bulk data. |
-| **Bidirectional** | Client sends an iterator; Server returns an iterator. | Real-time audio processing (Speech-to-Text). |
+| **Server-Side** | Client sends one request; Server sends a stream of messages. | Reading large datasets (BigQuery, Spanner) or watching logs. |
+| **Client-Side** | Client sends a stream of messages; Server waits for stream to close before sending a response. | Uploading large files or ingesting bulk data. |
+| **Bidirectional** | Both Client and Server send a stream of messages independently. | Real-time audio processing (Speech-to-Text), chat applications. |
 
 ### Server-Side Streaming Example (High-Level)
 
-A common example is running a query in BigQuery. The Python client exposes results as an iterator.
+A common example is running a query in BigQuery. The Python client returns an iterator that streams rows.
 
 ```python
 from google.cloud import bigquery
 
 client = bigquery.Client()
-query_job = client.query("SELECT * FROM `bigquery-public-data.samples.shakespeare` LIMIT 10")
+query_job = client.query("SELECT * FROM `bigquery-public-data.samples.shakespeare` LIMIT 100")
 
-# This iterator acts as a stream reader.
-# Internally, it handles fetching batches from the API.
+# This loop acts as a stream reader.
+# Internally, it reads results as they arrive.
 for row in query_job.result():
     print(dict(row))
 ```
 
 ### Server-Side Streaming Example (Low-Level)
 
-The generated clients support low-level gRPC Streaming. An example is the **BigQuery Storage API**. The `read_rows` method returns an iterable of responses.
+Low-level generated clients also support gRPC Streaming. For example, the **BigQuery Storage API** `read_rows` method returns an iterator of response objects.
 
 ```python
 from google.cloud import bigquery_storage_v1
 
 client = bigquery_storage_v1.BigQueryReadClient()
 
-# Streaming requires a valid 'read_stream' resource name
-request = bigquery_storage_v1.ReadRowsRequest(
-    read_stream="projects/my-proj/locations/us/sessions/session-id/streams/stream-id"
-)
+# Streaming requires a valid read_stream resource name
+stream_name = "projects/my-proj/locations/us/sessions/session-id/streams/stream-id"
+request = bigquery_storage_v1.ReadRowsRequest(read_stream=stream_name)
 
 # read_rows is a server-side streaming method
 stream = client.read_rows(request)
 
-# Iterate over the responses
+# Read from the stream
 for response in stream:
     # response is a ReadRowsResponse object
     row_data = response.avro_rows.serialized_binary_rows
@@ -242,30 +229,33 @@ for response in stream:
 
 ### gRPC Bidirectional Streaming
 
-In Python, bidirectional streaming methods usually accept an **iterator** (or generator) of request objects and return an **iterator** of response objects.
+Bidirectional streaming in Python typically involves passing an iterator of requests to a method and receiving an iterator of responses.
+
+If you are using **Cloud Speech-to-Text**, you will interact with the `streaming_recognize` method.
 
 ```python
 from google.cloud import speech_v2
 
 client = speech_v2.SpeechClient()
 
-# 1. Define a generator to yield requests
+# Define a generator to yield streaming requests
 def request_generator():
-    # Send Initial Configuration
-    yield speech_v2.StreamingRecognizeRequest(
-        recognizer=recognizer_name,
-        streaming_config=speech_v2.StreamingRecognitionConfig(
-            config=speech_v2.RecognitionConfig(
-                explicit_decoding_config=speech_v2.ExplicitDecodingConfig(
-                    encoding=speech_v2.ExplicitDecodingConfig.AudioEncoding.LINEAR16,
-                    sample_rate_hertz=16000,
-                    audio_channel_count=1,
-                )
-            )
+    # Send the Initial Configuration Request
+    config = speech_v2.RecognitionConfig(
+        explicit_decoding_config=speech_v2.ExplicitDecodingConfig(
+            encoding=speech_v2.ExplicitDecodingConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=16000,
+            audio_channel_count=1,
         )
     )
-    
-    # Send Audio Data
+    streaming_config = speech_v2.StreamingRecognitionConfig(config=config)
+
+    yield speech_v2.StreamingRecognizeRequest(
+        recognizer=recognizer_name,
+        streaming_config=streaming_config
+    )
+
+    # Send Audio Data Request(s)
     with open("audio.raw", "rb") as f:
         while True:
             chunk = f.read(4096)
@@ -273,12 +263,12 @@ def request_generator():
                 break
             yield speech_v2.StreamingRecognizeRequest(audio=chunk)
 
-# 2. Call the bidirectional method
+# streaming_recognize is a bidirectional streaming method
+# It takes an iterator of requests and returns an iterator of responses
 responses = client.streaming_recognize(requests=request_generator())
 
-# 3. Process the stream of responses
+# Read responses from the stream
 for response in responses:
     for result in response.results:
         print(f"Transcript: {result.alternatives[0].transcript}")
 ```
-
