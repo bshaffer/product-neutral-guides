@@ -1,10 +1,10 @@
-# Configuring Client Options for Google Cloud Java
+# Configuring Client Options for {{ gcp_name }} Java
 
-The Google Cloud Java Client Libraries (built on `gax-java` and `google-cloud-core`) allow you to configure client behavior using a Settings class and its associated Builder. Each service client has a corresponding settings class (e.g., `PubSubSettings` for `TopicAdminClient` or `SubscriptionAdminClient`).
+The {{ gcp_name }} Java Client Libraries (built on `gax-java` and `google-cloud-core`) allow you to configure client behavior using a Settings class and its associated Builder. Each service client has a corresponding settings class (e.g., `PubSubSettings` for `TopicAdminClient` or `SubscriptionAdminClient`).
 
 ## 1. Customizing the API Endpoint
 
-You can modify the API endpoint to connect to a specific Google Cloud region (to reduce latency or meet data residency requirements) or to a private endpoint (via Private Service Connect).
+You can modify the API endpoint to connect to a specific {{ gcp_name }} region (to reduce latency or meet data residency requirements) or to a private endpoint (via Private Service Connect).
 
 Some services, like Pub/Sub and Spanner, offer **regional endpoints**:
 

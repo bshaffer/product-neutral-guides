@@ -1,6 +1,6 @@
 # Authentication
 
-The recommended way to authenticate to the Google Cloud Java client libraries is to use
+The recommended way to authenticate to the {{ gcp_name }} Java client libraries is to use
 [Application Default Credentials (ADC)](https://cloud.google.com/docs/authentication/application-default-credentials),
 which discovers your credentials automatically, based on the environment where your code is running.
 To review all of your authentication options see [Credential Lookup](#credential-lookup).
@@ -10,7 +10,7 @@ Specific instructions and environment variables for each individual service are 
 
 ## Application Default Credentials (ADC)
 
-The Google Cloud Java client libraries provide several mechanisms to configure your system without providing
+The {{ gcp_name }} Java client libraries provide several mechanisms to configure your system without providing
 **Service Account Credentials** directly in code. These are known as Application Default Credentials.
 
 **Credentials** are discovered in the following order:
@@ -18,7 +18,7 @@ The Google Cloud Java client libraries provide several mechanisms to configure y
 1. Credentials specified in code
 2. Path to credential file in environment variables
 3. Credentials specified in a local ADC file
-4. Credentials from an attached service account (for code running on Google Cloud Platform)
+4. Credentials from an attached service account (for code running on {{ gcp_name }} Platform)
 
 ### Environment Variables
 
@@ -30,7 +30,7 @@ declaring them directly in code.
 // export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your-credentials-file.json"
 ```
 
-Here are the environment variables that Google Cloud Java checks for credentials:
+Here are the environment variables that {{ gcp_name }} Java checks for credentials:
 
 1. `GOOGLE_APPLICATION_CREDENTIALS` - Path to JSON file
 
@@ -62,34 +62,18 @@ To set up a local ADC file:
 **NOTE:** Because this method relies on your user credentials, it is _not_ recommended for running
 in production.
 
-### Google Cloud Platform environments
+### {{ gcp_name }} Platform environments
 
-While running on Google Cloud Platform environments such as Google Compute Engine, Google App Engine
+While running on {{ gcp_name }} Platform environments such as Google Compute Engine, Google App Engine
 and Google Kubernetes Engine, no extra work is needed. The **Credentials** are discovered
 automatically from the attached service account. Code should be written as if already authenticated.
 
 For more information, see
-[Set up ADC for Google Cloud services](https://cloud.google.com/docs/authentication/provide-credentials-adc#attached-sa).
-
-### Project ID detection
-
-Some libraries support setting up the project ID via the `GOOGLE_CLOUD_PROJECT` environment variable.
-
-The libraries that support this environment variable are:
-- Bigtable
-- PubSub
-- Storage
-- Spanner
-- BigQuery
-- Datastore
-- Firestore
-- Logging
-- Trace
-- Translate
+[Set up ADC for {{ gcp_name }} services](https://cloud.google.com/docs/authentication/provide-credentials-adc#attached-sa).
 
 ## Credentials Options
 
-Each Google Cloud Java client may be authenticated in code when creating a client library instance.
+Each {{ gcp_name }} Java client may be authenticated in code when creating a client library instance.
 Most clients use a `CredentialsProvider` for providing explicit credentials:
 
 ```java

@@ -1,10 +1,10 @@
-# Google Cloud Java Client Library: Core Concepts
+# {{ gcp_name }} Java Client Library: Core Concepts
 
-This documentation covers essential patterns and usage for the Google Cloud Java Client Library, focusing on performance (gRPC), data handling (Protobuf, Update Masks), and flow control (Pagination, LROs, Streaming).
+This documentation covers essential patterns and usage for the {{ gcp_name }} Java Client Library, focusing on performance (gRPC), data handling (Protobuf, Update Masks), and flow control (Pagination, LROs, Streaming).
 
 ## 1. Pagination
 
-Most list methods in the Google Cloud Java library return a `PagedResponse` object. This allows you to iterate over results without manually managing page tokens.
+Most list methods in the {{ gcp_name }} Java library return a `PagedResponse` object. This allows you to iterate over results without manually managing page tokens.
 
 The easiest way to handle pagination is to use the `iterateAll()` method. The library automatically fetches new pages in the background as you iterate through the collection.
 
@@ -121,7 +121,7 @@ if (currentOperation.getDone()) {
 
 ## 3. Update Masks
 
-When updating resources (PATCH requests), Google Cloud APIs often use an **Update Mask** (`com.google.protobuf.FieldMask`). This tells the server *exactly* which fields you intend to update, preventing accidental overwrites of other fields.
+When updating resources (PATCH requests), {{ gcp_name }} APIs often use an **Update Mask** (`com.google.protobuf.FieldMask`). This tells the server *exactly* which fields you intend to update, preventing accidental overwrites of other fields.
 
 If you do not provide a mask, some APIs update **all** fields, resetting missing ones to default values.
 
@@ -161,7 +161,7 @@ try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
 
 ## 4. Protobuf and gRPC
 
-The Google Cloud Java library primarily uses **gRPC** as the transport layer, with **REST** available for specific services.
+The {{ gcp_name }} Java library primarily uses **gRPC** as the transport layer, with **REST** available for specific services.
 
 * **Protobuf (Protocol Buffers):** A mechanism for serializing structured data. It is the interface language for gRPC.
 * **gRPC:** A high-performance, open-source universal RPC framework. It is generally faster than REST due to efficient binary serialization and HTTP/2 support.
@@ -208,7 +208,7 @@ gRPC Streaming allows continuous data flow between client and server. In Java, t
 | **Client-Side** | Client sends a stream of messages; Server waits for stream to close before sending a response. | Uploading large files or ingesting bulk data. |
 | **Bidirectional** | Both Client and Server send a stream of messages independently. | Real-time audio processing (Speech-to-Text), chat applications. |
 
-### Server-Side Streaming Example (High-Level)
+### Server-Side Streaming (High-Level)
 
 When running a query in BigQuery, the results are handled as an iterable stream.
 
@@ -227,7 +227,7 @@ for (FieldValueList row : result.iterateAll()) {
 }
 ```
 
-### Server-Side Streaming Example (Low-Level)
+### Server-Side Streaming (Low-Level)
 
 The generated clients support gRPC Streaming via `ServerStream`. An example of this is the **BigQuery Storage API**.
 

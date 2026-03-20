@@ -2,7 +2,7 @@
 
 Optimistic Concurrency Control (OCC) is a strategy used to manage shared resources and prevent "lost updates" or race conditions when multiple users or processes attempt to modify the same resource simultaneously.
 
-As an example, consider systems like Google Cloud IAM, where the shared resource is an **IAM Policy** applied to a resource (like a Project, Bucket, or Service). To implement OCC, systems typically use a version number or an `etag` (entity tag) field on the resource object.
+As an example, consider systems like {{ gcp_name }} {{ iam_name_short }}, where the shared resource is an **{{ iam_name_short }} Policy** applied to a resource (like a Project, Bucket, or Service). To implement OCC, systems typically use a version number or an `etag` (entity tag) field on the resource object.
 
 ## Introduction to OCC
 
@@ -18,7 +18,7 @@ Imagine two processes, A and B, try to update a shared resource at the same time
 
 Because Process **B** overwrites the resource *without* knowing that Process **A** already changed it, Process **A**'s updates are **lost**.
 
-OCC solves this by introducing a unique fingerprint which changes every time an entity is modified. In many systems (like IAM), this is done using an `etag`. The server checks this tag on every write:
+OCC solves this by introducing a unique fingerprint which changes every time an entity is modified. In many systems (like {{ iam_name_short }}), this is done using an `etag`. The server checks this tag on every write:
 
 1. When you read the resource, the server returns an `etag` (a unique fingerprint).
 
@@ -41,7 +41,7 @@ The core of the OCC implementation is a `while` loop that handles the retry logi
 | **Write/Check** | Attempt to save the modified resource using the old `etag`. This action must be inside a `try` block. | `try { client.setIamPolicy(resourceName, policy); return policy; } catch (AbortedException e) { // retry loop }` |
 | **Success/Retry** | If the write succeeds, exit the loop. If it fails with a concurrency error, increment the retry counter and continue the loop (go back to the Read step). |  |
 
-The following file provides a runnable example of how to implement the OCC loop using an IAM policy on a Project resource as the target.
+The following file provides a runnable example of how to implement the OCC loop using an {{ iam_name_short }} policy on a Project resource as the target.
 
 *Note: This example uses the `google-cloud-resourcemanager` library, but the same OCC pattern applies to any service or database that implements versioned updates.*
 
@@ -78,11 +78,11 @@ public class IamOccExample {
      *
      * This method demonstrates the core Read-Modify-Write-Retry pattern.
      *
-     * @param projectId  The Google Cloud Project ID (e.g., "my-project-123").
-     * @param role       The IAM role to grant (e.g., "roles/storage.objectAdmin").
+     * @param projectId  The {{ gcp_name }} Project ID (e.g., "my-project-123").
+     * @param role       The {{ iam_name_short }} role to grant (e.g., "roles/storage.objectAdmin").
      * @param member     The member to add (e.g., "user:user@example.com").
      * @param maxRetries The maximum number of times to retry the update.
-     * @return The successfully updated IAM policy (or null on failure).
+     * @return The successfully updated {{ iam_name_short }} policy (or null on failure).
      */
     public static Policy updateIamPolicyWithOcc(
             String projectId,
@@ -99,7 +99,7 @@ public class IamOccExample {
             while (retries < maxRetries) {
                 try {
                     // READ: Get the current policy. This includes the current etag.
-                    System.out.printf("Attempt %d: Reading current IAM policy for %s...%n", retries, projectName);
+                    System.out.printf("Attempt %d: Reading current {{ iam_name_short }} policy for %s...%n", retries, projectName);
                     GetIamPolicyRequest getIamPolicyRequest = GetIamPolicyRequest.newBuilder()
                             .setResource(projectName)
                             .build();
@@ -144,7 +144,7 @@ public class IamOccExample {
                             .build();
 
                     // WRITE/CHECK: Attempt to write the modified policy.
-                    System.out.printf("Attempt %d: Setting modified IAM policy...%n", retries);
+                    System.out.printf("Attempt %d: Setting modified {{ iam_name_short }} policy...%n", retries);
                     SetIamPolicyRequest setIamPolicyRequest = SetIamPolicyRequest.newBuilder()
                             .setResource(projectName)
                             .setPolicy(updatedPolicy)
@@ -152,7 +152,7 @@ public class IamOccExample {
                     Policy resultPolicy = projectsClient.setIamPolicy(setIamPolicyRequest);
 
                     // SUCCESS: If the call succeeds, return the new policy and exit the loop.
-                    System.out.printf("Successfully updated IAM policy in attempt %d.%n", retries);
+                    System.out.printf("Successfully updated {{ iam_name_short }} policy in attempt %d.%n", retries);
                     return resultPolicy;
 
                 } catch (AbortedException | FailedPreconditionException e) {
@@ -168,7 +168,7 @@ public class IamOccExample {
             // END OCC LOOP
         }
 
-        System.out.printf("Failed to update IAM policy after %d attempts due to persistent concurrency conflicts.%n", maxRetries);
+        System.out.printf("Failed to update {{ iam_name_short }} policy after %d attempts due to persistent concurrency conflicts.%n", maxRetries);
         return null;
     }
 }

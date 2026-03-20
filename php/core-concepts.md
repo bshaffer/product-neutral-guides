@@ -204,7 +204,7 @@ gRPC Streaming allows continuous data flow between client and server. In PHP, th
 | **Client-Side** | Client sends a stream of messages; Server waits for stream to close before sending a response. | Uploading large files or ingesting bulk data. |
 | **Bidirectional** | Both Client and Server send a stream of messages independently. | Real-time audio processing (Speech-to-Text), chat applications. |
 
-### Server-Side Streaming Example (High-Level)
+### Server-Side Streaming (High-Level)
 
 A common example is running a query in BigQuery or Spanner, or streaming logs. The PHP client exposes this as an iterable object.
 
@@ -222,7 +222,7 @@ foreach ($queryResults as $row) {
 }
 ```
 
-### Server-Side Streaming Example (Low-Level)
+### Server-Side Streaming (Low-Level)
 
 The generated clients also supoprt gRPC Streaming. An example of this is in the
 **BigQuery Storage API**. This `readRows` method returns a `ServerStream`.

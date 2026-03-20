@@ -1,6 +1,6 @@
 # Troubleshooting
 
-## **Debug Logging**
+## Debug Logging
 
 There are a few features built into the Google Cloud Python client libraries which can help you debug
 your application. This guide will show you how to log client library requests and responses.
@@ -209,11 +209,11 @@ translation = translate_v3.TranslationServiceClient()
 
 With this approach, you can have different clients and either log in only one or disable individual clients from logging to avoid excessive noise.
 
-## **How can I trace gRPC issues?**
+## How can I trace gRPC issues?
 
 When working with libraries that use gRPC (which is the default transport for many Google Cloud Python clients), you can use the underlying gRPC C-core environment variables to enable logging.
 
-### **Prerequisites**
+### Prerequisites
 
 Ensure you have the `grpcio` package installed. You can check this by running:
 
@@ -223,7 +223,7 @@ pip list | grep grpcio
 
 For detailed instructions, see the [gRPC installation documentation](https://cloud.google.com/python/docs/reference/).
 
-### **Transport logging with gRPC**
+### Transport logging with gRPC
 
 The primary method for debugging gRPC calls in Python is setting environment variables. These affect the underlying C extension. The environment variables affecting gRPC are [listed in the gRPC repository](https://github.com/grpc/grpc/blob/master/doc/environment_variables.md). The important ones for diagnostics are `GRPC_TRACE` and `GRPC_VERBOSITY`.
 
@@ -233,11 +233,11 @@ For example, you might want to start off with `GRPC_TRACE=all` and `GRPC_VERBOSI
 GRPC_VERBOSITY=debug GRPC_TRACE=all python your_script.py
 ```
 
-## **How can I diagnose proxy issues?**
+## How can I diagnose proxy issues?
 
 See [Client Configuration: Configuring a Proxy](/CLIENT_CONFIGURATION.md).
 
-## **Reporting a problem**
+## Reporting a problem
 
 If none of the above advice helps to resolve your issue, please ask for help. If you have a support contract with Google, please create an issue in the [support console](https://cloud.google.com/support/) instead of filing on GitHub. This will ensure a timely response.
 

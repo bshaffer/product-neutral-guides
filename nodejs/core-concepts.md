@@ -188,7 +188,7 @@ gRPC Streaming allows continuous data flow between the client and the server. In
 | **Client-Side** | Client sends a stream of messages; Server sends one response. | Uploading large files or bulk data ingestion. |
 | **Bidirectional** | Both Client and Server send a stream of messages independently. | Real-time audio processing (Speech-to-Text). |
 
-### Server-Side Streaming Example
+### Server-Side Streaming
 
 A common example is reading rows from a database or a storage stream. The Node.js client returns a Readable stream.
 

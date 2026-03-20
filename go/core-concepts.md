@@ -247,7 +247,7 @@ gRPC Streaming allows continuous data flow between client and server. In Go, thi
 | **Client-Side** | Client sends a stream of messages; Server waits for stream to close before sending a response. | Uploading large files or ingesting bulk data. |
 | **Bidirectional** | Both Client and Server send a stream of messages independently. | Real-time audio processing (Speech-to-Text). |
 
-### Server-Side Streaming Example
+### Server-Side Streaming
 
 An example of this is the **BigQuery Storage API**. The `ReadRows` method returns a stream that you can iterate through.
 

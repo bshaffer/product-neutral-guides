@@ -1,4 +1,4 @@
-# Google Cloud Rust Client Library: Streaming
+# Working with streams
 
 gRPC Streaming allows continuous data flow between client and server. In Rust, this is implemented
 using `tonic::Streaming` and `futures::Stream`.
@@ -11,7 +11,7 @@ using `tonic::Streaming` and `futures::Stream`.
 | **Client-Side** | Client sends a stream of messages; Server waits for stream to close before sending a response. | Uploading large files or ingesting bulk data. |
 | **Bidirectional** | Both Client and Server send a stream of messages independently. | Real-time audio processing (Speech-to-Text). |
 
-## Server-Side Streaming Example
+## Server-Side Streaming
 
 A common example is reading rows from BigQuery Storage. The client returns a stream that you can iterate over.
 

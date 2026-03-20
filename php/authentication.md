@@ -74,24 +74,6 @@ automatically from the attached service account. Code should be written as if al
 For more information, see
 [Set up ADC for Google Cloud services](https://cloud.google.com/docs/authentication/provide-credentials-adc#attached-sa).
 
-### Project ID detection
-
-Some libraries support setting up the project ID via the `GOOGLE_CLOUD_PROJECT` environment variable.
-```php
-putenv("GOOGLE_CLOUD_PROJECT=<YOUR_PROJECT_ID>");
-```
-The libraries that support this environment variable are:
-- Bigtable
-- PubSub
-- Storage
-- Spanner
-- BigQuery
-- Datastore
-- Firestore
-- Logging
-- Trace
-- Translate
-
 ## Credentials Options
 
 Each Google Cloud PHP client may be authenticated in code when creating a client library instance.

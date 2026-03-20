@@ -187,7 +187,7 @@ gRPC Streaming allows continuous data flow between client and server. In Python,
 | **Client-Side** | Client sends a stream of messages; Server waits for stream to close before sending a response. | Uploading large files or ingesting bulk data. |
 | **Bidirectional** | Both Client and Server send a stream of messages independently. | Real-time audio processing (Speech-to-Text), chat applications. |
 
-### Server-Side Streaming Example (High-Level)
+### Server-Side Streaming (High-Level)
 
 A common example is running a query in BigQuery. The Python client returns an iterator that streams rows.
 
@@ -203,7 +203,7 @@ for row in query_job.result():
     print(dict(row))
 ```
 
-### Server-Side Streaming Example (Low-Level)
+### Server-Side Streaming (Low-Level)
 
 Low-level generated clients also support gRPC Streaming. For example, the **BigQuery Storage API** `read_rows` method returns an iterator of response objects.
 

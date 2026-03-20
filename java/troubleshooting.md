@@ -1,8 +1,8 @@
 # Troubleshooting
 
-## **Debug Logging**
+## Debug Logging
 
-There are a few features built into the Google Cloud Java client libraries which can help you debug
+There are a few features built into the {{ gcp_name }} Java client libraries which can help you debug
 your application. This guide will show you how to log client library requests and responses.
 
 > :warning:
@@ -148,7 +148,7 @@ There are a few ways to configure debug logging which we will go through in this
 
 ### The `java.util.logging` configuration
 
-You can enable logging for the clients by configuring the Java logging system. Create a `logging.properties` file to set the log level to `FINE` for the Google Cloud libraries. Once this configuration is loaded, the clients will start logging requests to the console.
+You can enable logging for the clients by configuring the Java logging system. Create a `logging.properties` file to set the log level to `FINE` for the {{ gcp_name }} libraries. Once this configuration is loaded, the clients will start logging requests to the console.
 
 ```properties
 # logging.properties
@@ -161,7 +161,7 @@ Logs usually come with a request log and a response log, the exception being str
 
 ### Using a custom Logger
 
-The Google Cloud Java libraries use standard logging abstractions. If you are using a logging framework like SLF4J with Logback or Log4j2, you can configure the levels in your respective configuration files (e.g., `logback.xml` or `log4j2.xml`).
+The {{ gcp_name }} Java libraries use standard logging abstractions. If you are using a logging framework like SLF4J with Logback or Log4j2, you can configure the levels in your respective configuration files (e.g., `logback.xml` or `log4j2.xml`).
 
 ```xml
 <!-- logback.xml example -->
@@ -204,15 +204,15 @@ Logger.getLogger("com.google.cloud.translate").setLevel(Level.OFF);
 TranslationServiceClient translation = TranslationServiceClient.create();
 ```
 
-## **How can I trace gRPC issues?**
+## How can I trace gRPC issues?
 
-When working with libraries that use gRPC (which is the default transport for many Google Cloud Java clients), you can enable tracing by configuring the `io.grpc` logger levels.
+When working with libraries that use gRPC (which is the default transport for many {{ gcp_name }} Java clients), you can enable tracing by configuring the `io.grpc` logger levels.
 
-### **Prerequisites**
+### Prerequisites
 
-Ensure you have the necessary gRPC dependencies in your `pom.xml` or `build.gradle`. gRPC is included by default when you use the Google Cloud client libraries.
+Ensure you have the necessary gRPC dependencies in your `pom.xml` or `build.gradle`. gRPC is included by default when you use the {{ gcp_name }} client libraries.
 
-### **Transport logging with gRPC**
+### Transport logging with gRPC
 
 The primary method for debugging gRPC calls in Java is setting the log level for the `io.grpc` package. You can do this via a `logging.properties` file or programmatically.
 
@@ -228,16 +228,16 @@ If you need even more detailed information about the HTTP/2 frames and low-level
 Logger.getLogger("io.grpc").setLevel(Level.FINEST);
 ```
 
-## **How can I diagnose proxy issues?**
+## How can I diagnose proxy issues?
 
 See [Client Configuration: Configuring a Proxy](/CLIENT_CONFIGURATION.md).
 
-## **Reporting a problem**
+## Reporting a problem
 
 If none of the above advice helps to resolve your issue, please ask for help. If you have a support contract with Google, please create an issue in the [support console](https://cloud.google.com/support/) instead of filing on GitHub. This will ensure a timely response.
 
 Otherwise, please either file an issue on GitHub or ask a question on [Stack Overflow](https://stackoverflow.com/). In most cases creating a GitHub issue will result in a quicker turnaround time, but if you believe your question is likely to help other users in the future, Stack Overflow is a good option. When creating a Stack Overflow question, please use the [google-cloud-platform tag](https://stackoverflow.com/questions/tagged/google-cloud-platform) and [java tag](https://stackoverflow.com/questions/tagged/java).
 
-Although there are multiple GitHub repositories associated with the Google Cloud Libraries, we recommend filing an issue in [https://github.com/googleapis/google-cloud-java](https://github.com/googleapis/google-cloud-java) unless you are certain that it belongs elsewhere. The maintainers may move it to a different repository where appropriate, but you will be notified of this via the email associated with your GitHub account.
+Although there are multiple GitHub repositories associated with the {{ gcp_name }} Libraries, we recommend filing an issue in [https://github.com/googleapis/google-cloud-java](https://github.com/googleapis/google-cloud-java) unless you are certain that it belongs elsewhere. The maintainers may move it to a different repository where appropriate, but you will be notified of this via the email associated with your GitHub account.
 
 When filing an issue or asking a Stack Overflow question, please include as much of the following information as possible. This will enable us to help you quickly.

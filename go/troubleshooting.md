@@ -1,6 +1,6 @@
 # Troubleshooting
 
-## **Debug Logging**
+## Debug Logging
 
 There are a few features built into the Google Cloud Go client libraries which can help you debug your application. This guide will show you how to log client library requests and responses.
 
@@ -205,17 +205,17 @@ bigtableClient, err := bigtable.NewClient(ctx, projectID, instanceID,
 translationClient, err := translate.NewTranslationClient(ctx)
 ```
 
-## **How can I trace gRPC issues?**
+## How can I trace gRPC issues?
 
 When working with libraries that use gRPC (the default transport for most Google Cloud Go clients), you can use the gRPC-Go environment variables to enable detailed internal logging.
 
-### **Prerequisites**
+### Prerequisites
 
 Ensure your project is using Go modules. You can verify your dependencies in your `go.mod` file.
 
 For detailed instructions on setting up your environment, see the [Go Google Cloud documentation](https://cloud.google.com/go/docs/reference).
 
-### **Transport logging with gRPC**
+### Transport logging with gRPC
 
 The primary method for debugging gRPC calls in Go is setting environment variables that affect the gRPC-Go implementation. The important variables for diagnostics are `GRPC_GO_LOG_SEVERITY_LEVEL` and `GRPC_GO_LOG_VERBOSITY_LEVEL`.
 
@@ -225,11 +225,11 @@ For example, setting `GRPC_GO_LOG_SEVERITY_LEVEL=info` and `GRPC_GO_LOG_VERBOSIT
 GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=2 go run your_script.go
 ```
 
-## **How can I diagnose proxy issues?**
+## How can I diagnose proxy issues?
 
 See [Client Configuration: Configuring a Proxy](/CLIENT_CONFIGURATION.md).
 
-## **Reporting a problem**
+## Reporting a problem
 
 If none of the above advice helps to resolve your issue, please ask for help. If you have a support contract with Google, please create an issue in the [support console](https://cloud.google.com/support/) instead of filing on GitHub. This will ensure a timely response.
 
